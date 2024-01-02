@@ -2,7 +2,7 @@ import base64
 import itertools
 from typing import Callable, Any, Dict
 
-from utils.english_language import english_language_letter_freqs, MOST_COMMON
+from utils.english_language import MOST_COMMON
 
 
 def convert_hex_to_b64(hex_s: str) -> str:
@@ -55,9 +55,8 @@ def score_string_by_hist(s: str, hist: dict) -> float:
     # return abs(score)
 
 
-def single_byte_xor_cipher(message: bytes, scoring_fn: Callable[[str, dict], float] = score_string_by_hist) -> list[
+def single_byte_xor_cipher(message: bytes | list[int], scoring_fn: Callable[[str, dict], float] = score_string_by_hist) -> list[
     Dict[str, Any]]:
-    english_freqs = english_language_letter_freqs()
 
     decoded_messages = []
     for key in range(256):

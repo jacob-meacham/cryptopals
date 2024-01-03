@@ -1,4 +1,4 @@
-from utils.aes import aes_ecb_decrypt, is_aes_ecb
+from utils.aes import is_aes_ecb
 
 ciphertexts = []
 with open('1_8.txt', 'r') as f:
@@ -7,4 +7,5 @@ with open('1_8.txt', 'r') as f:
 
 aes_ciphertexts = [c for c in ciphertexts if is_aes_ecb(bytes.fromhex(c))]
 
-assert len(aes_ciphertexts) == 1, f'Expected one AES encrypted ciphertext, found {len(aes_ciphertexts)} instead'
+def test_ciphertexts():
+    assert len(aes_ciphertexts) == 1, f'Expected one AES encrypted ciphertext, found {len(aes_ciphertexts)} instead'

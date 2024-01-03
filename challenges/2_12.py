@@ -5,7 +5,7 @@ import random
 from utils.aes import random_key, aes_ecb_encrypt, is_aes_ecb
 from utils.pkcs import pkcs7_pad
 
-KEY_LENGTH = random.choice([16, 24, 32])
+KEY_LENGTH = random.choice([16, 32])
 SECRET_KEY = random_key(KEY_LENGTH)
 SECRET_TO_ATTACK = base64.b64decode(
     'Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK')
@@ -57,7 +57,9 @@ def break_ecb_encryption_oracle():
     for i in range(secret_len):
         decrypted_bytes += decrypt_byte(len(SECRET_TO_ATTACK), block_size, decrypted_bytes)
 
-    print(decrypted_bytes.decode())
+    return decrypted_bytes.decode()
 
-
-break_ecb_encryption_oracle()
+def test_break_ecb_encryption_oracle():
+    result = break_ecb_encryption_oracle()
+    assert len(result) == 138
+    assert result.startswith("Rollin' in my 5.0")

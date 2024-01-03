@@ -15,9 +15,9 @@ def aes_encryption_oracle(plaintext: bytes, key: bytes = None):
         key = random_key()
     if random.randint(0, 1) == 0:
         iv = random_key()
-        ciphertext = aes_cbc_encrypt(key, pkcs7_pad(padded_text, len(key)), iv)
+        ciphertext = aes_cbc_encrypt(pkcs7_pad(padded_text, len(key)), key, iv)
     else:
-        ciphertext = aes_ecb_encrypt(key, pkcs7_pad(padded_text, len(key)))
+        ciphertext = aes_ecb_encrypt(pkcs7_pad(padded_text, len(key)), key)
 
     return ciphertext
 

@@ -12,7 +12,7 @@ SECRET_TO_ATTACK = base64.b64decode(
 
 def ecb_encryption_oracle(payload: bytes):
     padded_text = pkcs7_pad(payload + SECRET_TO_ATTACK, KEY_LENGTH)
-    return aes_ecb_encrypt(SECRET_KEY, padded_text)
+    return aes_ecb_encrypt(padded_text, SECRET_KEY)
 
 
 def test_break_ecb_encryption_oracle():

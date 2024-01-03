@@ -10,7 +10,7 @@ def convert_hex_to_b64(hex_s: str) -> str:
     return b64.decode('utf-8')
 
 
-def repeating_key_xor(b1: bytes, b2: bytes) -> bytes:
+def block_xor(b1: bytes, b2: bytes) -> bytes:
     return bytes([a ^ b for a, b in zip(b1, itertools.cycle(b2))])
 
 
@@ -23,7 +23,7 @@ def hamming_distance_arr(l: list[bytes]) -> float:
     return sum(distances) / len(distances)
 
 
-# TODO: Very basic, could make it better
+# N.B. Very basic scoring mechanism
 def score_string_by_hist(s: str, hist: dict) -> float:
     score = 0
 
@@ -61,7 +61,7 @@ def single_byte_xor_cipher(message: bytes | list[int], scoring_fn: Callable[[str
     decoded_messages = []
     for key in range(256):
         try:
-            decoded_message = repeating_key_xor(message, key.to_bytes()).decode()
+            decoded_message = block_xor(message, key.to_bytes()).decode()
             decoded_messages.append({'key': key.to_bytes(),
                                      'value': decoded_message, 'score': scoring_fn(decoded_message, MOST_COMMON)})
         except UnicodeDecodeError:
@@ -85,7 +85,7 @@ def test_repeating_key_xor():
 
     s1 = '1c0111001f010100061a024b53535009181c'
     key = '686974207468652062756c6c277320657965'
-    result = repeating_key_xor(bytes.fromhex(s1), bytes.fromhex(key))
+    result = block_xor(bytes.fromhex(s1), bytes.fromhex(key))
 
     assert result == expected_result, f"For s1 '{s1}' and key '{key}', expected result '{expected_result.hex()}' but got '{result.hex()}'"
 
@@ -94,8 +94,8 @@ def test_repeating_key_xor_inverse():
     s1 = 'It was the best of times, it was the worst of times'
     key = b'MY SECRET KEY'
 
-    encoded = repeating_key_xor(s1.encode(), key)
-    decoded = repeating_key_xor(encoded, key).decode('ascii')
+    encoded = block_xor(s1.encode(), key)
+    decoded = block_xor(encoded, key).decode('ascii')
 
     assert decoded == s1, f'For key {key}, expected {s1}, got {decoded}'
 

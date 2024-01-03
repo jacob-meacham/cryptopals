@@ -2,7 +2,7 @@ import random
 from typing import Dict
 
 from utils.aes import random_key, aes_ecb_encrypt, aes_ecb_decrypt
-from utils.pkcs import pkcs7_pad, pkcs7_unpad
+from utils.pkcs import pkcs7_pad, pkcs7_unpad, pkcs7_pad_str
 
 
 def parse_cookie(cookie: str) -> Dict:
@@ -30,19 +30,17 @@ def profile_for(email: str) -> str:
     })
 
 
-# TODO: Set other key lengths
-#KEY_LENGTH = random.choice([16, 24, 32])
-KEY_LENGTH = 16
+KEY_LENGTH = random.choice([16, 32])
 SECRET_KEY = random_key(KEY_LENGTH)
 
 
 def get_encrypted_user_session(email: str) -> bytes:
     padded_text = pkcs7_pad(profile_for(email).encode(), KEY_LENGTH)
-    return aes_ecb_encrypt(SECRET_KEY, padded_text)
+    return aes_ecb_encrypt(padded_text, SECRET_KEY)
 
 
 def get_decrypted_user_session(ciphertext: bytes) -> Dict:
-    decrypted_text = aes_ecb_decrypt(SECRET_KEY, ciphertext)
+    decrypted_text = aes_ecb_decrypt(ciphertext, SECRET_KEY)
     unpadded_text = pkcs7_unpad(decrypted_text)
     user = parse_cookie(unpadded_text.decode())
 
@@ -70,7 +68,7 @@ def pwn_user():
     user_block = encrypted_user_session[:-block_size]
 
     email_payload = 'a' * (block_size - len('email=') - len('@a.b')) + '@a.b'
-    payload = email_payload + 'admin' + '\x0b' * 11
+    payload = email_payload + pkcs7_pad_str('admin', block_size)
     admin_block = get_encrypted_user_session(payload)[block_size:block_size*2]
     encrypted_user_session = user_block + admin_block
 

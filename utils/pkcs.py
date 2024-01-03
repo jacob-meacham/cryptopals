@@ -5,6 +5,9 @@ def pkcs7_pad(data: bytes, block_size: int) -> bytes:
     padding = block_size - (len(data) % block_size)
     return data + bytes([padding] * padding)
 
+def pkcs7_pad_str(data: str, block_size: int) -> str:
+    return pkcs7_pad(data.encode(), block_size).decode()
+
 
 class PKCS7ValidationError(Exception):
     pass

@@ -1,7 +1,7 @@
 import base64
 
 from utils.english_language import MOST_COMMON
-from utils.utils import single_byte_xor_cipher, repeating_key_xor, hamming_distance_arr, \
+from utils.utils import single_byte_xor_cipher, block_xor, hamming_distance_arr, \
     score_string_by_hist
 
 
@@ -19,7 +19,7 @@ def attack_with_keysize(encoded: bytes, keysize: int) -> str:
     key = b''.join(best_keys)
 
     # Decrypt the encoded message using the key
-    return repeating_key_xor(encoded, key).decode()
+    return block_xor(encoded, key).decode()
 
 
 def attack_repeating_key_xor(encoded: bytes, keysize_range: tuple) -> str:

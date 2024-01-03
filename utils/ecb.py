@@ -1,18 +1,7 @@
 import math
 from typing import Callable
 
-from utils.aes import is_aes_ecb
-
-
-def determine_block_and_secret_size(oracle: Callable[[bytes], bytes]) -> (int, int):
-    initial_length = len(oracle(b''))
-    i = 1
-    while True:
-        payload = b'A' * i
-        length = len(oracle(payload))
-        if length > initial_length:
-            return length - initial_length, initial_length - len(payload)
-        i += 1
+from utils.aes import is_aes_ecb, determine_block_and_secret_size, determine_prefix_length
 
 
 def decrypt_byte(oracle: Callable[[bytes], bytes], secret_length: int, block_size: int, padding_length: int, known_bytes: bytes) -> bytes:
@@ -45,16 +34,7 @@ def break_ecb_encryption_oracle(oracle: Callable[[bytes], bytes], key_length: in
     assert is_aes_ecb(oracle(b'A' * 128))
 
     # Determine if there is any padding at the beginning
-    padding_length = 0
-    prev_block = oracle(b'A')[:block_size]
-    for i in range(2, block_size):
-        payload = b'A' * i
-        ciphertext = oracle(payload)
-        if ciphertext[:block_size] == prev_block:
-            padding_length = block_size - i + 1
-            break
-        prev_block = ciphertext[:block_size]
-
+    padding_length = determine_prefix_length(oracle, block_size)
     assert padding_length == prefix_length
 
     secret_len -= padding_length
